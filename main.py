@@ -72,7 +72,7 @@ async def get_path(request: Request):
         }
     '''
     json = await request.json()
-    mc.get_path(json)
+    return mc.get_path(json)
     return       {
             "stations" :
             [
