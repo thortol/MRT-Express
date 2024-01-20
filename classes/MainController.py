@@ -7,55 +7,11 @@ class MainController:
     def __init__(self):
         file = open("station_time.txt", "r")
         self.station_times = eval(file.readline())
-        self.exits = {
-            "DT13" : {
-                "DT35": {
-                    "Platform": "A",
-                    "A": ("8","5","10"),
-                    "B": ("9","5","10")
-                },
-                "DT1": {
-                    "Platform": "B",
-                    "A": ("5","8","3"),
-                    "B": ("6","8","3")
-                }
-            },
-            "DT1" : {
-                "DT35": {
-                    "Platform": "A",
-                    "A": ("8","5","10"),
-                    "B": ("9","5","10")
-                },
-                "DT1": {
-                    "Platform": "B",
-                    "A": ("5","8","3"),
-                    "B": ("6","8","3")
-                }
-            },
-            "NE7": {
-                "NE1": {
-                    "Platform": "A",
-                    "A": ("8","5","10"),
-                    "B": ("8","5","10")
-                },
-                "NE17": {
-                    "Platform": "B",
-                    "A": ("5","8","3"),
-                    "B": ("5","8","3")
-                }
-            }
-        }
-        self.transfers = {
-            "CC10": {
-                "DT1": ("1","1","1"),
-                "DT35": ("12", "12", "12")
-            },
-            "NE7": {
-                "DT1": ("1","1","1"),
-                "DT35": ("12", "12", "12")
-            }
-        }
-    
+        file = open("exit_data.txt", "r")
+        self.exits = eval(file.readline())
+        file = open("transfer_data.txt", "r")
+        self.transfers = eval(file.readline())
+
     def convert(self, start_station, end_station):
         if start_station.startswith("DT"):
             if int(start_station[2:]) > int(end_station[2:]):
@@ -65,6 +21,10 @@ class MainController:
             if int(start_station[2:]) > int(end_station[2:]):
                 return "NE1"
             return "NE17"
+        if start_station.startswith("EW") or start_station.startswith("CG"):
+            if int(start_station[2:]) > int(end_station[2:]):
+                return "EW1"
+            return "EW33"
     
     def is_same_line(self, station_1, station_2):
         return station_1[:2] == station_2[:2]
@@ -80,6 +40,7 @@ class MainController:
         path = self.path_finding(json["start"], json["end"])
         if not self.is_same_line(path[1][-1],path[1][-2]):
             del path[1][-1]
+        print(path)
         json = self.convert_path_to_format(path[1], json["exit"])
         json["time"] = path[0]
         return json
@@ -129,7 +90,7 @@ class MainController:
                 else:
                     temp_dir = self.convert(path[i+2], path[i+3])
                     details = str(self.transfers[path[i+1]][temp_dir])
-                instructions["details"] = "Platform " + self.exits[path[i+1]][dir]["Platform"] + ", Door " + details
+                instructions["details"] = "Platform " + self.exits[path[i]][dir]["Platform"] + ", Door " + details
                 instructions["towards"] = dir
                 stations[-1]["instructions"].append(instructions)
             else:
