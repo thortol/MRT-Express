@@ -1,14 +1,17 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 import uvicorn
 
+from classes import MainController
+
 app = FastAPI()
+mc = MainController()
 
 @app.get("/")
 async def root():
     return "hi"
 
-@app.get("/get_path")
-async def get_path():
+@app.post("/get_path")
+async def get_path(request: Request):
     '''
     Function:   gets something
 
@@ -33,7 +36,7 @@ async def get_path():
             [
                 {
                     "name": "EW24",
-                    "instructions:                 
+                    "instructions":                 
                     [
                         {
                             "type":"board",
@@ -50,7 +53,7 @@ async def get_path():
                         {
                             "type": "transfer",
                             "description": "transfer to circle line"
-                        }
+                        },
                         {
                             "type":"board",
                             "station": "EW21",
@@ -68,6 +71,41 @@ async def get_path():
             "number":123
         }
     '''
+    json = await request.json()
+    print(json)
+    return       {
+            "stations" :
+            [
+                {
+                    "name": "EW24",
+                    "instructions" :                
+                    [
+                        {
+                            "type":"board",
+                            "station": "EW24",
+                            "details": "Platform A, Door 7",
+                            "towards": "EW1"
+                        }
+                    ]
+                },
+                {
+                    "name": "EW21",
+                    "instructions":
+                    [
+                        {
+                            "type": "transfer",
+                            "description": "transfer to circle line"
+                        },
+                        {
+                            "type":"board",
+                            "station": "EW21",
+                            "details": "Platform A, Door 7",
+                            "towards": "CC1"
+                        }
+                    ]
+                }
+            ]
+        }
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=5000,reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=5001,reload=True)
