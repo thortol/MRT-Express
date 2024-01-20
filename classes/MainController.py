@@ -20,6 +20,18 @@ class MainController:
                     "B": ("6","8","3")
                 }
             },
+            "DT1" : {
+                "DT35": {
+                    "Platform": "A",
+                    "A": ("8","5","10"),
+                    "B": ("9","5","10")
+                },
+                "DT1": {
+                    "Platform": "B",
+                    "A": ("5","8","3"),
+                    "B": ("6","8","3")
+                }
+            },
             "NE7": {
                 "NE1": {
                     "Platform": "A",
@@ -53,11 +65,24 @@ class MainController:
             if int(start_station[2:]) > int(end_station[2:]):
                 return "NE1"
             return "NE17"
+    
+    def is_same_line(self, station_1, station_2):
+        return station_1[:2] == station_2[:2]
 
+    def get_line(self, station):
+        if station.startswith("DT"):
+            return "downtown line"
+        if station.startswith("NE"):
+            return "northeast line"
+        return "A line"
+    
     def get_path(self, json):
         path = self.path_finding(json["start"], json["end"])
-        print(path)
-        return self.convert_path_to_format(path[1], json["exit"])
+        if not self.is_same_line(path[1][-1],path[1][-2]):
+            del path[1][-1]
+        json = self.convert_path_to_format(path[1], json["exit"])
+        json["time"] = path[0]
+        return json
     
     def path_finding(self, start, end):
         queue = [(0, start, -1, [])]
@@ -88,13 +113,14 @@ class MainController:
         stations = []
         need_new = True
         for i in range(len(path)-1):
-            if path[i][:2] == path[i+1][:2]:
-                if need_new:
-                    stations.append([])
-                need_new = True
+            if self.is_same_line(path[i],path[i+1]):
                 dir = self.convert(path[i], path[i+1])
                 station = {}
                 station["name"] = path[i]
+                station["instructions"] = []
+                if need_new:
+                    stations.append(station)
+                need_new = True
                 instructions = {}
                 instructions["type"] = "board"
                 instructions["station"] = path[i]
@@ -105,11 +131,15 @@ class MainController:
                     details = str(self.transfers[path[i+1]][temp_dir])
                 instructions["details"] = "Platform " + self.exits[path[i+1]][dir]["Platform"] + ", Door " + details
                 instructions["towards"] = dir
-                stations[-1].append(instructions)
+                stations[-1]["instructions"].append(instructions)
             else:
                 need_new = False
-                stations.append([])
-                stations[-1].append({"type":"transfer", "description":"transfer to new line"})
+                station = {}
+                station["name"] = path[i]
+                station["instructions"] = []
+                stations.append(station)
+                stations[-1]["instructions"].append({"type":"transfer", "description":"transfer to " + self.get_line(path[i+1])})
+        stations.append({"name":path[-1], "instructions":[]})
         return {"stations": stations}
 
 
