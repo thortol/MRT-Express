@@ -5,6 +5,7 @@ for line in file:
 rows = total.split("\n`,")
 exits = {}
 transfers = {}
+jks = {}
 for row in rows:
     name, dir, towards, doors, transfer = row.split(",")
     platform, end = towards.split("/")
@@ -13,10 +14,16 @@ for row in rows:
     # if end in exits[name]:
     #     print("oop")
     exits[name][end] = {"Platform":platform}
-    doors = doors[1:-1].split("\n")
+    if "\n" in doors:
+        doors = doors[1:-1].split("\n")
+    else:
+        doors = [doors]
     for door in doors:
         exit_val, esc, lift, stairs = door.split("/")
         exits[name][end][exit_val] = (esc, lift, stairs)
+        if name not in jks:
+            jks[name] = set()
+        jks[name].add(exit_val)
     if transfer != "":
         if name not in transfers:
             transfers[name] = {}
@@ -80,7 +87,27 @@ for row in rows:
                 transfers[name][dir1] = (a,b,c)
                 transfers[name][dir2] = (a,b,c)
 
-file = open("exit_data.txt", "w")
-file.write(str(exits))
-file.close()
-print(exits)
+char = "ABCDEFGHIJKLMNOP"
+nums = "123456789"
+for i in jks:
+    jks[i] = sorted(list(jks[i]))
+    if jks[i][-1] in char:
+        if char.index(jks[i][-1])+1 != len(jks[i]):
+            print("oop")
+        else:
+            jks[i] = jks[i][-1]
+    elif jks[i][-1] in nums:
+        if nums.index(jks[i][-1])+1 != len(jks[i]):
+            print("oop")
+        else:
+            jks[i] = jks[i][-1]
+    else:
+        print(jks[i][-1])
+print(jks)
+
+file1 = open("exit_data.txt", "w")
+file2 = open("transfer_data.txt", "w")
+file3 = open("jk.txt", "w")
+file1.write(str(exits))
+file2.write(str(transfers))
+file3.write(str(jks))
