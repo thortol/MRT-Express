@@ -68,15 +68,17 @@ class MainController:
             return "DTL"
         if station.startswith("NE"):
             return "NEL"
-        if station.startswith("EW") or station.startswith("CG"):
+        if station.startswith("EW"):
             return "EWL"
+        if station.startswith("CG"):
+            return "CGL"
         if station.startswith("NS"):
             return "NSL"
         if station.startswith("CC") or station.startswith("CC"):
             return "CCL"
         if station.startswith("TE"):
             return "TEL"
-        return "LRT"
+        return station
     
     def get_path(self, json):
         path = self.path_finding(json["start"], json["end"])
@@ -85,7 +87,6 @@ class MainController:
             del path[1][-1]
         if not self.is_same_line(path[1][0],path[1][1]):
             del path[1][0]
-        print(path)
         json = self.convert_path_to_format(path[1], json["exit"])
         json["time"] = path[0]
         return json
@@ -102,7 +103,6 @@ class MainController:
                 data.append(end)
                 return time, data
             for next_station in self.station_times[cur]:
-                if cur == "PTC": print("yay")
                 temp_dir = dir
                 temp_data = data[:]
                 if next_station[2] == 2 and temp_dir == -1:
@@ -143,7 +143,7 @@ class MainController:
                         details = list(self.transfers[path[i+1]][temp_dir])
                 except Exception as e:
                     print(e)
-                    details = ["0","0","0"]
+                    details = ["Any door","Any door","Any door"]
 
                 try:
                     if dir not in self.exits[path[i]]:
