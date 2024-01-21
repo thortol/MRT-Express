@@ -69,18 +69,18 @@ class MainController:
 
     def get_line(self, station):
         if station.startswith("DT"):
-            return "downtown line"
+            return "DTL"
         if station.startswith("NE"):
-            return "northeast line"
+            return "NEL"
         if station.startswith("EW") or station.startswith("CG"):
-            return "eastwest line"
+            return "EWL"
         if station.startswith("NS"):
-            return "northsouth line"
+            return "NSL"
         if station.startswith("CC") or station.startswith("CC"):
-            return "circle line"
+            return "CCL"
         if station.startswith("TE"):
-            return "thomson east coast line"
-        return "A line"
+            return "TEL"
+        return "LRT"
     
     def get_path(self, json):
         path = self.path_finding(json["start"], json["end"])
@@ -170,7 +170,7 @@ class MainController:
                 station["name"] = path[i]
                 station["instructions"] = []
                 stations.append(station)
-                stations[-1]["instructions"].append({"type":"transfer", "description":"transfer to " + self.get_line(path[i+1])})
+                stations[-1]["instructions"].append({"type":"transfer", "description":self.get_line(path[i+1])})
         stations.append({"name":path[-1], "instructions":[]})
         return {"stations": stations}
 
