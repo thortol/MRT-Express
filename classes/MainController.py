@@ -61,6 +61,10 @@ class MainController:
             first = "CC"
         if second == "CE":
             second = "CC"
+        if first.startswith("P") and second.startswith("P"):
+            return True
+        if first.startswith("S") and second.startswith("S"):
+            return True
         return first == second
 
     def get_line(self, station):
@@ -101,7 +105,8 @@ class MainController:
             if cur == end:
                 data.append(end)
                 return time, data
-            for next_station in self.station_times.get(cur, []):
+            for next_station in self.station_times[cur]:
+                if cur == "PTC": print("yay")
                 temp_dir = dir
                 temp_data = data[:]
                 if next_station[2] == 2 and temp_dir == -1:
@@ -113,8 +118,10 @@ class MainController:
                     temp_data.append(cur)
                     temp_dir = next_station[2]
                 elif temp_dir != next_station[2]:
-                    continue
+                    temp_dir = next_station[2]
                 heapq.heappush(queue, [time + next_station[1], next_station[0], temp_dir, temp_data])
+        
+        print(visited)
         return "error no path found"
 
     def convert_path_to_format(self, path, exit):
@@ -132,19 +139,30 @@ class MainController:
                 instructions = {}
                 instructions["type"] = "board"
                 instructions["station"] = path[i]
-                if i + 2 == len(path):
-                    details = list(self.exits[path[i+1]][dir][exit])
-                else:
-                    temp_dir = self.convert(path[i+2], path[i+3])
-                    details = list(self.transfers[path[i+1]][temp_dir])
-                if dir not in self.exits[path[i]]:
-                    if dir == "CE2":
-                        dir = "CC1"
-                    elif dir == "CG2":
-                        dir = "EW1"
-                instructions["details"] = "Platform " + self.exits[path[i]][dir]["Platform"]
+                try:
+                    if i + 2 == len(path):
+                        details = list(self.exits[path[i+1]][dir][exit])
+                    else:
+                        temp_dir = self.convert(path[i+2], path[i+3])
+                        details = list(self.transfers[path[i+1]][temp_dir])
+                except Exception as e:
+                    print(e)
+                    details = [0,0,0]
+
+                try:
+                    if dir not in self.exits[path[i]]:
+                        if dir == "CE2":
+                            dir = "CC1"
+                        elif dir == "CG2":
+                            dir = "EW1"
+                    instructions["details"] = "Platform " + self.exits[path[i]][dir]["Platform"]
+                    instructions["towards"] = dir
+                except Exception as e:
+                    print(e, "as)")
+                    instructions["details"] = "Platform"
+                    instructions["towards"] = path[i+1]
+
                 instructions["door"] = details
-                instructions["towards"] = dir
                 stations[-1]["instructions"].append(instructions)
             else:
                 need_new = False
