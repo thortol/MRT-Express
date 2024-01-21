@@ -57,6 +57,10 @@ class MainController:
             return True
         if first.startswith("S") and second.startswith("S"):
             return True
+        if first == "CE":
+            first = "CC"
+        if second == "CE":
+            second = "CC"
         return first == second
 
     def get_line(self, station):
@@ -159,6 +163,8 @@ class MainController:
             else:
                 need_new = False
                 station = {}
+                if path[i] == "CG0":
+                    path[i] = "EW4"
                 station["name"] = path[i]
                 station["instructions"] = []
                 stations.append(station)
