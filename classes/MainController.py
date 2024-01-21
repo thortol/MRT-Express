@@ -53,14 +53,6 @@ class MainController:
     def is_same_line(self, station_1, station_2):
         first = station_1[:2]
         second = station_2[:2]
-        if first == "CG":
-            first = "EW"
-        if second == "CG":
-            second = "EW"
-        if first == "CE":
-            first = "CC"
-        if second == "CE":
-            second = "CC"
         if first.startswith("P") and second.startswith("P"):
             return True
         if first.startswith("S") and second.startswith("S"):
@@ -147,7 +139,7 @@ class MainController:
                         details = list(self.transfers[path[i+1]][temp_dir])
                 except Exception as e:
                     print(e)
-                    details = [0,0,0]
+                    details = ["0","0","0"]
 
                 try:
                     if dir not in self.exits[path[i]]:
