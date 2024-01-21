@@ -80,6 +80,7 @@ class MainController:
     
     def get_path(self, json):
         path = self.path_finding(json["start"], json["end"])
+        print(path)
         if not self.is_same_line(path[1][-1],path[1][-2]):
             del path[1][-1]
         if not self.is_same_line(path[1][0],path[1][1]):
@@ -132,16 +133,17 @@ class MainController:
                 instructions["type"] = "board"
                 instructions["station"] = path[i]
                 if i + 2 == len(path):
-                    details = str(self.exits[path[i+1]][dir][exit])
+                    details = list(self.exits[path[i+1]][dir][exit])
                 else:
                     temp_dir = self.convert(path[i+2], path[i+3])
-                    details = str(self.transfers[path[i+1]][temp_dir])
+                    details = list(self.transfers[path[i+1]][temp_dir])
                 if dir not in self.exits[path[i]]:
                     if dir == "CE2":
                         dir = "CC1"
                     elif dir == "CG2":
                         dir = "EW1"
-                instructions["details"] = "Platform " + self.exits[path[i]][dir]["Platform"] + ", Door " + details
+                instructions["details"] = "Platform " + self.exits[path[i]][dir]["Platform"]
+                instructions["door"] = details
                 instructions["towards"] = dir
                 stations[-1]["instructions"].append(instructions)
             else:
