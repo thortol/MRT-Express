@@ -37,8 +37,14 @@ class MainController:
             if int(start_station[2:]) > int(end_station[2:]):
                 return "CC1"
             return "CC29"
+        if start_station.startswith("CE") and end_station.startswith("CE"):
+            if int(start_station[2:]) > int(end_station[2:]):
+                return "CC29"
+            return "CE2"
         if end_station.startswith("CE"):
             return "CE2"
+        if start_station.startswith("CE"):
+            return "CC29"
         if start_station.startswith("TE"):
             if int(start_station[2:]) > int(end_station[2:]):
                 return "TE1"
@@ -74,7 +80,7 @@ class MainController:
             return "CGL"
         if station.startswith("NS"):
             return "NSL"
-        if station.startswith("CC") or station.startswith("CC"):
+        if station.startswith("CC") or station.startswith("CE"):
             return "CCL"
         if station.startswith("TE"):
             return "TEL"
@@ -142,6 +148,8 @@ class MainController:
                         temp_dir = self.convert(path[i+2], path[i+3])
                         details = list(self.transfers[path[i+1]][temp_dir])
                 except Exception as e:
+                    print(temp_dir)
+                    print("oop")
                     print(e)
                     details = ["Any door","Any door","Any door"]
 
