@@ -148,8 +148,6 @@ class MainController:
                         temp_dir = self.convert(path[i+2], path[i+3])
                         details = list(self.transfers[path[i+1]][temp_dir])
                 except Exception as e:
-                    print(temp_dir)
-                    print("oop")
                     print(e)
                     details = ["Any door","Any door","Any door"]
 
